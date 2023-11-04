@@ -2,6 +2,7 @@
 // https://code.tutsplus.com/the-best-way-to-deep-copy-an-object-in-javascript--cms-39655a
 // https://juejin.cn/post/6844904048701751303
 // https://stackoverflow.com/questions/41588068/object-assign-override-nested-property
+import * as lodash from 'lodash';
 function replacer(key: string,value: any)
 {
     if (key=="inner_data_type") return undefined;
@@ -39,9 +40,19 @@ class Subject {
 class Factory {
     name: string = "";
     location: string = "";
+    director: Person = new Person();
 
     show(): string {
         return "factory name: "+this.name + " location: " + this.location;
+    }
+}
+
+class Person {
+    name: string = "";
+    age: number = 0;
+    sex: string = "male";
+    showInfo(): string {
+        return "name is: " + this.name + " age: " + this.age + " sex: " + this.sex;
     }
 }
 
@@ -70,6 +81,9 @@ car.name = "Mercedes-Benz";
 car.speed = 240;
 car.factory.name = "Bremen factory";
 car.factory.location = "Bremen German";
+car.factory.director.name = "Thomas Müller";
+car.factory.director.age = 40;
+car.factory.director.sex = "male";
 console.log("car: ", car)
 console.log("car run: ", car.run(), "show factory" + car.factory.show())
 const serializedCar = JSON.stringify(car, replacer);
@@ -82,7 +96,7 @@ deserializedCar = Object.assign(new Car(), deserializedCar);
 console.log("deserializedCar: ", deserializedCar);
 console.log("deserializedCar run: ", deserializedCar.run(), "show factory" + deserializedCar.factory.show())
 const deserializedCar2 = decodeNested(new Car(), carObj2);
-console.log("deserializedCar2 run: " + deserializedCar2.run(), "deserializedCar2 show factory: ", deserializedCar2.factory.show());
+console.log("deserializedCar2 run: " + deserializedCar2.run(), "deserializedCar2 show factory: ", deserializedCar2.factory.show(), "factor director info: ", deserializedCar2.factory.director.showInfo());
 
 function decodeNested(instance: any, obj: object): any {
     let key: keyof typeof instance;
@@ -91,11 +105,19 @@ function decodeNested(instance: any, obj: object): any {
         let value = obj[key];
         console.log("decodeNested filed, key:  ", key, " value: ", value, "instance[",key,"]: ", instance[key]);
         if (typeof value == 'object') {
-            console.log("object key: ", key ," value: ", value);
+            console.log("object fields, object key: ", key ," value: ", value);
             // @ts-ignore
-            instance[key] = Object.assign(instance[key], obj[key]);
+            instance[key] = decodeNested(instance[key], obj[key]);
+            console.log("instance[key] value", instance[key]);
         }
     }
-    instance = Object.assign(instance, deserializedCar);
+    const instance_tmp = lodash.cloneDeep(instance);
+    instance = Object.assign(instance, obj);
+    for (key in obj) {
+        if (typeof instance[key] == 'object') {
+            instance[key] = instance_tmp[key];
+        }
+    }
+    console.log("current instance: ", instance);
     return instance;
 }
