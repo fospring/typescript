@@ -56,7 +56,23 @@ class Person {
     }
 }
 
+class Record {
+    content: string= "";
+    constructor() {
+        this.content = "";
+    }
+    show() {
+        return "record: " + this.content;
+    }
+}
+
 class Car {
+    static schema = {
+        name: "string",
+        speed: "number",
+        factory: Factory,
+        records: { key: 'string', value: Record }
+    };
     name: string = "";
     speed: number = 0;
     factory: Factory = new Factory();

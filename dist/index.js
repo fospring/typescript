@@ -50,6 +50,15 @@ class Person {
         return "name is: " + this.name + " age: " + this.age + " sex: " + this.sex;
     }
 }
+class Record {
+    constructor() {
+        this.content = "";
+        this.content = "";
+    }
+    show() {
+        return "record: " + this.content;
+    }
+}
 class Car {
     constructor() {
         this.name = "";
@@ -60,6 +69,12 @@ class Car {
         return this.name + " run with speed: " + this.speed.toString();
     }
 }
+Car.schema = {
+    name: "string",
+    speed: "number",
+    factory: Factory,
+    records: { key: 'string', value: Record }
+};
 const student = new Student("Alice", 12, new Subject("math", 100));
 console.log("student info ", student);
 console.log("student sayHello: ", student.sayHello());
