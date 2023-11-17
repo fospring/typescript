@@ -67,9 +67,7 @@ function decodeNested(instance, obj) {
     for (key in obj) {
         // @ts-ignore
         let value = obj[key];
-        console.log("decodeNested filed, key:  ", key, " value: ", value, "instance[", key, "]: ", instance[key]);
         if (typeof value == 'object') {
-            console.log("object fields, object key: ", key, " value: ", value);
             // @ts-ignore
             instance[key] = decodeNested(instance[key], obj[key]);
             console.log("instance[key] value", instance[key]);
@@ -98,8 +96,13 @@ function decodeNested2(instance, obj) {
             let ty = instance.constructor.schema[key];
             if (ty !== undefined && ty.hasOwnProperty("map")) {
                 console.log("map type");
-                instance[key][Object.keys(value)[0]] = decodeNested2(new ty["map"]["value"](), Object.values(value)[0]);
+                for (let mkey in value) {
+                    instance[key][mkey] = decodeNested2(new ty["map"]["value"](), value[mkey]);
+                }
+            } else if (ty !== undefined && ty.hasOwnProperty("arr")) {
+                console.log("vec type");
             } else {
+                // normal case
                 instance[key].constructor.schema = instance.constructor.schema[key];
                 instance[key] = decodeNested2(instance[key], obj[key]);
             }
@@ -137,6 +140,9 @@ console.log("deserializedCar run: " + deserializedCar.run(), "deserializedCar2 s
 let record1 = new Record();
 record1.content = "today is a good day";
 car.records['key1'] = record1;
+let record2 = new Record();
+record2.content = "tomorrow will be a good day";
+car.records['key2'] = record2;
 serializedCar = JSON.stringify(car);
 console.log("serialized car with records: " + serializedCar);
 console.log("car schema: ", car.constructor.schema);
