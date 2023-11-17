@@ -43,18 +43,35 @@ class Record {
     }
 }
 
+class Wheel {
+    constructor() {
+        this.position = "";
+    }
+    show() {
+        return "wheel position: " + this.position;
+    }
+}
+
+function new_wheel(position) {
+    let wheel = new Wheel();
+    wheel.position = position;
+    return wheel;
+}
+
 class Car {
     static schema = {
         name: "string",
         speed: "number",
         factory: Factory,
-        records: {map: { key: 'string', value: Record }}
+        records: {map: { key: 'string', value: Record }},
+        wheels: {array: {value: Wheel}}
     };
     constructor() {
         this.name = "";
         this.speed = 0;
         this.factory = new Factory();
         this.records = {};
+        this.wheels = [];
     }
 
     run() {
@@ -99,8 +116,11 @@ function decodeNested2(instance, obj) {
                 for (let mkey in value) {
                     instance[key][mkey] = decodeNested2(new ty["map"]["value"](), value[mkey]);
                 }
-            } else if (ty !== undefined && ty.hasOwnProperty("arr")) {
-                console.log("vec type");
+            } else if (ty !== undefined && ty.hasOwnProperty("array")) {
+                console.log("vector type");
+                for (let k in value) {
+                    instance[key].push(decodeNested2(new ty["array"]["value"](), value[k]));
+                }
             } else {
                 // normal case
                 instance[key].constructor.schema = instance.constructor.schema[key];
@@ -143,6 +163,7 @@ car.records['key1'] = record1;
 let record2 = new Record();
 record2.content = "tomorrow will be a good day";
 car.records['key2'] = record2;
+car.wheels.push(new_wheel("left front wheel"), new_wheel("right front wheel"));
 serializedCar = JSON.stringify(car);
 console.log("serialized car with records: " + serializedCar);
 console.log("car schema: ", car.constructor.schema);
