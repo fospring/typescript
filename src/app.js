@@ -1,5 +1,4 @@
 const lodash = require("lodash");
-console.log("Hello world!")
 
 class Person {
     static schema = {
@@ -58,13 +57,23 @@ function new_wheel(position) {
     return wheel;
 }
 
+// mock UnorderedMap
+class MockUnorderedMap {
+    constructor(prefix) {
+        this.prefix = prefix;
+        this._keys = [];
+        this.values = [];
+    }
+}
+
 class Car {
     static schema = {
         name: "string",
         speed: "number",
         factory: Factory,
         records: {map: { key: 'string', value: Record }},
-        wheels: {array: {value: Wheel}}
+        wheels: {array: {value: Wheel}},
+        mock_unorder_map: {unorder_map: {value: 'string'}}
     };
     constructor() {
         this.name = "";
@@ -72,6 +81,7 @@ class Car {
         this.factory = new Factory();
         this.records = {};
         this.wheels = [];
+        this.mock_unorder_map = new MockUnorderedMap('a');
     }
 
     run() {
@@ -121,6 +131,13 @@ function decodeNested2(instance, obj) {
                 for (let k in value) {
                     instance[key].push(decodeNested2(new ty["array"]["value"](), value[k]));
                 }
+            } else if (ty !== undefined && ty.hasOwnProperty("unorder_map")) {
+                instance[key].constructor.schema = ty;
+                let subtype_value = ty["unorder_map"]["value"];
+                instance[key].subtype = function () {
+                    return subtype_value;
+                }
+                instance[key] = decodeNested2(instance[key], obj[key]);
             } else {
                 // normal case
                 instance[key].constructor.schema = instance.constructor.schema[key];
@@ -129,12 +146,16 @@ function decodeNested2(instance, obj) {
             console.log("instance[key] value", instance[key]);
         }
     }
+    let subtype = instance.subtype;
     const instance_tmp = lodash.cloneDeep(instance);
     instance = Object.assign(instance, obj);
     for (key in obj) {
         if (typeof instance[key] == 'object') {
             instance[key] = instance_tmp[key];
         }
+    }
+    if (subtype !== undefined) {
+        instance.subtype = subtype;
     }
     console.log("current instance: ", instance);
     return instance;
@@ -170,3 +191,5 @@ console.log("car schema: ", car.constructor.schema);
 const carObj2 = JSON.parse(serializedCar);
 let deserializedCar2 = decodeNested2(new Car(), carObj2);
 console.log("deserializedCar2: ", deserializedCar2);
+console.log("mock_unorder_map's subtype: ", deserializedCar2.mock_unorder_map.subtype());
+console.log("JSON.stringify(deserializedCar2): \n", JSON.stringify(deserializedCar2));
