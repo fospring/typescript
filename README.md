@@ -92,7 +92,6 @@ node src/app.js
 ```
 response:
 ```text
-Hello world!
 car schema:  {
   name: 'string',
   speed: 'number',
@@ -100,7 +99,8 @@ car schema:  {
     schema: { name: 'string', location: 'string', director: [Function] }
   },
   records: { map: { key: 'string', value: [class Record] } },
-  wheels: { array: { value: [class Wheel] } }
+  wheels: { array: { value: [class Wheel] } },
+  mock_unorder_map: { unorder_map: { value: 'string' } }
 }
 car run: Mercedes-Benz run with speed: 240
 carObj:  {
@@ -112,7 +112,8 @@ carObj:  {
     director: { name: 'Thomas Müller', age: 40, sex: 'male' }
   },
   records: {},
-  wheels: []
+  wheels: [],
+  mock_unorder_map: { prefix: 'a', _keys: [], values: [] }
 }
 current instance:  Person { name: 'Thomas Müller', age: 40, sex: 'male' }
 instance[key] value Person { name: 'Thomas Müller', age: 40, sex: 'male' }
@@ -130,6 +131,12 @@ current instance:  {}
 instance[key] value {}
 current instance:  []
 instance[key] value []
+current instance:  []
+instance[key] value []
+current instance:  []
+instance[key] value []
+current instance:  MockUnorderedMap { prefix: 'a', _keys: [], values: [] }
+instance[key] value MockUnorderedMap { prefix: 'a', _keys: [], values: [] }
 current instance:  Car {
   name: 'Mercedes-Benz',
   speed: 240,
@@ -139,10 +146,11 @@ current instance:  Car {
     director: Person { name: 'Thomas Müller', age: 40, sex: 'male' }
   },
   records: {},
-  wheels: []
+  wheels: [],
+  mock_unorder_map: MockUnorderedMap { prefix: 'a', _keys: [], values: [] }
 }
 deserializedCar run: Mercedes-Benz run with speed: 240 deserializedCar2 show factory:  factory name: Bremen factory location: Bremen German factor director info:  name is: Thomas Müller age: 40 sex: male
-serialized car with records: {"name":"Mercedes-Benz","speed":240,"factory":{"name":"Bremen factory","location":"Bremen German","director":{"name":"Thomas Müller","age":40,"sex":"male"}},"records":{"key1":{"content":"today is a good day"},"key2":{"content":"tomorrow will be a good day"}},"wheels":[{"position":"left front wheel"},{"position":"right front wheel"}]}
+serialized car with records: {"name":"Mercedes-Benz","speed":240,"factory":{"name":"Bremen factory","location":"Bremen German","director":{"name":"Thomas Müller","age":40,"sex":"male"}},"records":{"key1":{"content":"today is a good day"},"key2":{"content":"tomorrow will be a good day"}},"wheels":[{"position":"left front wheel"},{"position":"right front wheel"}],"mock_unorder_map":{"prefix":"a","_keys":[],"values":[]}}
 car schema:  {
   name: 'string',
   speed: 'number',
@@ -150,7 +158,8 @@ car schema:  {
     schema: { name: 'string', location: 'string', director: [Function] }
   },
   records: { map: { key: 'string', value: [class Record] } },
-  wheels: { array: { value: [class Wheel] } }
+  wheels: { array: { value: [class Wheel] } },
+  mock_unorder_map: { unorder_map: { value: 'string' } }
 }
 decodeNested filed, key:   name  value:  Mercedes-Benz instance[ name ]:  
 decodeNested filed, key:   speed  value:  240 instance[ speed ]:  0
@@ -215,6 +224,29 @@ instance[key] value [
   Wheel { position: 'left front wheel' },
   Wheel { position: 'right front wheel' }
 ]
+decodeNested filed, key:   mock_unorder_map  value:  { prefix: 'a', _keys: [], values: [] } instance[ mock_unorder_map ]:  MockUnorderedMap { prefix: 'a', _keys: [], values: [] }
+object fields, object key:  mock_unorder_map  value:  { prefix: 'a', _keys: [], values: [] }
+decodeNested filed, key:   prefix  value:  a instance[ prefix ]:  a
+decodeNested filed, key:   _keys  value:  [] instance[ _keys ]:  []
+object fields, object key:  _keys  value:  []
+current instance:  []
+instance[key] value []
+decodeNested filed, key:   values  value:  [] instance[ values ]:  []
+object fields, object key:  values  value:  []
+current instance:  []
+instance[key] value []
+current instance:  MockUnorderedMap {
+  prefix: 'a',
+  _keys: [],
+  values: [],
+  subtype: [Function (anonymous)]
+}
+instance[key] value MockUnorderedMap {
+  prefix: 'a',
+  _keys: [],
+  values: [],
+  subtype: [Function (anonymous)]
+}
 current instance:  Car {
   name: 'Mercedes-Benz',
   speed: 240,
@@ -230,7 +262,13 @@ current instance:  Car {
   wheels: [
     Wheel { position: 'left front wheel' },
     Wheel { position: 'right front wheel' }
-  ]
+  ],
+  mock_unorder_map: MockUnorderedMap {
+    prefix: 'a',
+    _keys: [],
+    values: [],
+    subtype: [Function (anonymous)]
+  }
 }
 deserializedCar2:  Car {
   name: 'Mercedes-Benz',
@@ -247,6 +285,15 @@ deserializedCar2:  Car {
   wheels: [
     Wheel { position: 'left front wheel' },
     Wheel { position: 'right front wheel' }
-  ]
+  ],
+  mock_unorder_map: MockUnorderedMap {
+    prefix: 'a',
+    _keys: [],
+    values: [],
+    subtype: [Function (anonymous)]
+  }
 }
+mock_unorder_map's subtype:  string
+JSON.stringify(deserializedCar2): 
+ {"name":"Mercedes-Benz","speed":240,"factory":{"name":"Bremen factory","location":"Bremen German","director":{"name":"Thomas Müller","age":40,"sex":"male"}},"records":{"key1":{"content":"today is a good day"},"key2":{"content":"tomorrow will be a good day"}},"wheels":[{"position":"left front wheel"},{"position":"right front wheel"}],"mock_unorder_map":{"prefix":"a","_keys":[],"values":[]}}
 ```
